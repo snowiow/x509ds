@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+<soapenv:Header>
+  <wsa:Action xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing/" soapenv:actor="" soapenv:mustUnderstand="0">http://schemas.xmlsoap.org/ws/2005/02/trust/RST/SCT
+  </wsa:Action>
+  <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" soapenv:actor="" soapenv:mustUnderstand="1">
+    <wsu:Timestamp xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="timestamp">
+      <wsu:Created>2015-12-16T13:39:36Z</wsu:Created>
+      <wsu:Expires>2015-12-16T13:44:36Z</wsu:Expires>
+    </wsu:Timestamp>
+    <wsse:BinarySecurityToken xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3" wsu:Id="binarytoken">MIID2DCCAsCgAwIBAgIJAKjSw2Nly9ssMA0GCSqGSIb3DQEBCwUAMIGAMQswCQYD
+VQQGEwJERTEQMA4GA1UECAwHSGFtYnVyZzEQMA4GA1UEBwwHSGFtYnVyZzERMA8G
+A1UECgwIc25vdy1kZXYxEDAOBgNVBAMMB3Nub3dpb3cxKDAmBgkqhkiG9w0BCQEW
+GW1hcmNlbC5wYXR6d2FobEBnbWFpbC5jb20wHhcNMTgwMzI0MDkzNDQyWhcNMTgw
+NDIzMDkzNDQyWjCBgDELMAkGA1UEBhMCREUxEDAOBgNVBAgMB0hhbWJ1cmcxEDAO
+BgNVBAcMB0hhbWJ1cmcxETAPBgNVBAoMCHNub3ctZGV2MRAwDgYDVQQDDAdzbm93
+aW93MSgwJgYJKoZIhvcNAQkBFhltYXJjZWwucGF0endhaGxAZ21haWwuY29tMIIB
+IjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5NImszOu90tAAaKS9C/XiJED
+sm5odZSv9DQfJqc1BX9of38VOhwugYEMoCC7RK/fTn7JcGojO+KITrPDf1jYI9KN
+MOeSnys5ihPxBZRBNlevOjPf2hmT2BToCi6DrYrfl/7QdkN0cwoA2b5Dwlaz6W00
+R3u1YpNQgA8AzoHH0jHbgq+flI2qX/KSRUMffEttpQRlR6Vu3aEmFMvTpl2n2stn
+7c1R5EPKT3Z8Zg791leW9VC1aRu/RSThlVQGVveBjV7oH8fxgdEbvQbT8pbaou75
+kHMbFlhSbaCwOeDUEjHcIPRdGm2DXV5/+dy9UpK+bg5qHKA2w7idrI3Oi0GHPQID
+AQABo1MwUTAdBgNVHQ4EFgQUUomFdrR/l4ZSJqt1E1pgQJaxYr4wHwYDVR0jBBgw
+FoAUUomFdrR/l4ZSJqt1E1pgQJaxYr4wDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG
+9w0BAQsFAAOCAQEA2pgJIIdWZuAuavyIGBdW87puHcE8EjX4Wywj8ky4QbbDQXWT
+1YcARNsP5A0KLmQOmi35chnX7pAJZXClcb4hdw5R+HH2OS4LK0EolkUpbes2uHZC
+nrtURmnzSWvg/FIL1uOnLmlAmu7hz5xaXP+EGM+T2Nn81PyMCNBuBstAQjywILqr
+rfXwoLUiSZ/vUM+H4vx97TNqm7ZwoznmzIZmqutQcjoZmwPOh7ywdyITJ6If3ATk
+dfeZZF3b8iAt1ymk6FcomvxzjeK/Kz7RC4e9K8nZVf8Ga1C3zfkPLra0DZRB47Bh
+YmrSV4U9onpiBQlzVOB9XGaOTUS3VAFxVyA2Iw==</wsse:BinarySecurityToken>
+  </wsse:Security>
+</soapenv:Header>
+<soapenv:Body xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="body">
+  <RequestSecurityToken xmlns="http://schemas.xmlsoap.org/ws/2005/02/trust">
+    <TokenType>http://schemas.xmlsoap.org/ws/2005/02/sc/sct</TokenType>
+    <RequestType>http://schemas.xmlsoap.org/ws/2005/02/trust/Issue</RequestType>
+  </RequestSecurityToken>
+</soapenv:Body>
+</soapenv:Envelope>
