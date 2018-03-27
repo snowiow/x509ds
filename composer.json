@@ -1,5 +1,5 @@
 {
-    "name": "snow-i3/x509ds",
+    "name": "snowiow/x509ds",
     "description": "X509 signing lib",
     "type": "library",
     "license": "MIT",
