@@ -37,9 +37,9 @@ final class Signer
     private $target;
 
     /**
-     * @var SignatureNodeFactory
+     * @var DOMDocument
      */
-    private $signatureNodeFactory;
+    private $document;
 
     /**
      * Create a Signer from the given Private Key
@@ -94,19 +94,16 @@ final class Signer
      */
     public function setDocument($doc): void
     {
-        $document = null;
         if (!is_string($doc)) {
-            $document = $doc;
-        } elseif (is_file($doc)) {
-            $document = DOMDocument::load($doc);
+            $this->document = $doc;
         } else {
-            $document = DOMDocument::loadXML($doc);
+            $this->document = new DOMDocument();
+            if (is_file($doc)) {
+                $this->document->load($doc);
+            } else {
+                $this->document->loadXML($doc);
+            }
         }
-        $this->signatureNodeFactory = new SignatureNodeFactory(
-            $this->canonization->getMethod(),
-            $this->signature->getMethod(),
-            $document
-        );
     }
 
     /**
@@ -114,7 +111,7 @@ final class Signer
      */
     public function getDocument(): DOMDocument
     {
-        return $this->signatureNodeFactory->getDocument();
+        return $this->document;
     }
 
     public function setTags(array $tags): void
@@ -124,18 +121,23 @@ final class Signer
 
     public function sign(): DOMDocument
     {
-        $document     = $this->signatureNodeFactory->getDocument();
+        $signatureNodeFactory = new SignatureNodeFactory(
+            $this->canonization->getMethod(),
+            $this->signature->getMethod(),
+            $this->document
+        );
+
         $digestValues = [];
         foreach ($this->tags as $tag => $uri) {
-            $node               = $document->getElementsByTagName($tag)->item(0);
-            $canonized          = $this->canonization->C14N($node);
-            $digestValues[$uri] = base64_encode($this->signature->calculate($canonized));
+            $node                   = $this->document->getElementsByTagName($tag)->item(0);
+            $canonized              = $this->canonization->C14N($node);
+            $digestValues[$uri]     = base64_encode($this->signature->calculate($canonized));
         }
-        $signedInfoNode = $this->signatureNodeFactory->createSignatureNode($this->target, $digestValues);
+        $signedInfoNode = $signatureNodeFactory->createSignatureNode($this->target, $digestValues);
         $canonized      = $this->canonization->C14N($signedInfoNode);
         $signature      = $this->privateKey->sign($canonized);
-        $this->signatureNodeFactory->appendSignatureValueNode('Signature', base64_encode($signature));
+        $signatureNodeFactory->appendSignatureValueNode('Signature', base64_encode($signature));
 
-        return $this->signatureNodeFactory->getDocument();
+        return $this->document;
     }
 }

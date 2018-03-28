@@ -3,6 +3,7 @@
 namespace X509DS;
 
 use DOMDocument;
+use DOMElement;
 use DOMNode;
 
 /**
@@ -70,7 +71,11 @@ final class SignatureNodeFactory
         $signatureNode->appendChild($signedInfoNode);
         $targetNode->appendChild($signatureNode);
 
-        return $signedInfoNode;
+        // Otherwise the returned signedInfo C14N doesn't countain parent ns
+        $xml = $this->document->saveXML();
+        $this->document->loadXML($xml);
+
+        return $this->document->getElementsByTagName('SignedInfo')->item(0);
     }
 
     public function createSignatureMethodNode(): DOMNode
@@ -86,19 +91,15 @@ final class SignatureNodeFactory
     public function createReferenceNode(string $uri, string $value): DOMNode
     {
         $referenceNode = $this->document->createElement('ds:Reference');
-        $attr          = $this->document->createAttribute('URI');
-        $attr->value   = $uri;
-        $referenceNode->appendChild($attr);
+        $attr          = $referenceNode->setAttribute('URI', $uri);
 
         $transformsNode   = $this->document->createElement('ds:Transforms');
         $transformNode    = $this->document->createElement('ds:Transform');
-        $canonizationAttr = $this->createAlgorithmAttribute($this->canonizationMethod);
-        $transformNode->appendChild($canonizationAttr);
+        $this->createAlgorithmAttribute($transformNode, $this->canonizationMethod);
         $transformsNode->appendChild($transformNode);
 
         $digestMethodNode = $this->document->createElement('ds:DigestMethod');
-        $digestAttr       = $this->createAlgorithmAttribute($this->signatureMethod);
-        $digestMethodNode->appendChild($digestAttr);
+        $digestAttr       = $this->createAlgorithmAttribute($digestMethodNode, $this->signatureMethod);
 
         $digestValueNode = $this->document->createElement('ds:DigestValue', $value);
 
@@ -119,8 +120,7 @@ final class SignatureNodeFactory
     private function createNodeWithAlgorithm(string $nodeName, string $method): DOMNode
     {
         $node = $this->document->createElement($nodeName);
-        $attr = $this->createAlgorithmAttribute($method);
-        $node->appendChild($attr);
+        $attr = $this->createAlgorithmAttribute($node, $method);
 
         return $node;
     }
@@ -131,11 +131,8 @@ final class SignatureNodeFactory
      * @param string $algo the name of the algorithm, which will be the value
      *                     of the attribute
      */
-    private function createAlgorithmAttribute(string $algo): DOMNode
+    private function createAlgorithmAttribute(DOMElement $elem, string $algo): void
     {
-        $algoAttr        = $this->document->createAttribute('Algorithm');
-        $algoAttr->value = $algo;
-
-        return $algoAttr;
+        $elem->setAttribute('Algorithm', $algo);
     }
 }
