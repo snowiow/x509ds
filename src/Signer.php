@@ -3,6 +3,7 @@
 namespace X509DS;
 
 use DOMDocument;
+use X509DS\Exceptions\InvalidPfxException;
 
 /**
  * Class Signer
@@ -59,6 +60,30 @@ final class Signer
         }
 
         return new self(PrivateKey::fromContent($pkey, $password));
+    }
+
+    /**
+     * Create a Signer from the given Pfx File
+     *
+     * @param string $pfx      path or content of the pfx file
+     * @param string $password the password for securing the pfx
+     *
+     * @throw InvalidPfxException will be thrown if openssl can't read the pfx
+     *
+     * @return Signer
+     */
+    public static function fromPfx(string $pfx, string $password): self
+    {
+        $pfxContent = $pfx;
+        if (file_exists($pfx)) {
+            $pfxContent = file_get_contents($pfx);
+        }
+        $result = openssl_pkcs12_read($pfxContent, $certs, $password);
+        if ($result === false) {
+            throw new InvalidPfxException();
+        }
+
+        return self::fromPrivateKey($certs['pkey']);
     }
 
     /**

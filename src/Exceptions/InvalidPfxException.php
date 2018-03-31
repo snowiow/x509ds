@@ -5,14 +5,14 @@ namespace X509DS\Exceptions;
 use Exception;
 
 /**
- * Class InvalidKeyException
+ * Class InvalidPfxException
  *
  * @package X509\Exceptions
  */
-final class InvalidKeyException extends Exception
+final class InvalidPfxException extends Exception
 {
     public function __construct()
     {
-        parent::__construct('Could not parse key');
+        parent::__construct('Could not parse pfx');
     }
 }

@@ -6,6 +6,7 @@ use Codeception\Specify;
 use DOMDocument;
 use PHPUnit\Framework\TestCase;
 use X509DS\Canonization;
+use X509DS\Exceptions\InvalidPfxException;
 use X509DS\Signer;
 
 class SignerTest extends TestCase
@@ -13,8 +14,8 @@ class SignerTest extends TestCase
     use Specify;
 
     private const PKEY = __DIR__ . '/resources/private.key';
-
-    private const XML = __DIR__ . '/resources/request.xml';
+    private const PFX  = __DIR__ . '/resources/test.pfx';
+    private const XML  = __DIR__ . '/resources/request.xml';
 
     public function testFromPrivateKey()
     {
@@ -34,6 +35,26 @@ class SignerTest extends TestCase
             $this->should('accept a path to a private key', function () {
                 $signer = Signer::fromPrivateKey(self::PKEY);
                 $this->assertInstanceOf(Signer::class, $signer);
+            });
+        });
+    }
+
+    public function testFromPfx()
+    {
+        $this->describe('Signer', function () {
+            $this->should('accept a valid pfx', function () {
+                $signer = Signer::fromPfx(self::PFX, 'secret');
+                $this->assertInstanceOf(Signer::class, $signer);
+            });
+            $this->should('reject a pfx with invalid password', function () {
+                $this->expectException(InvalidPfxException::class);
+                $this->expectExceptionMessage('Could not parse pfx');
+                Signer::fromPfx(self::PFX, 'wrongpw');
+            });
+            $this->should('reject an invalid file', function () {
+                $this->expectException(InvalidPfxException::class);
+                $this->expectExceptionMessage('Could not parse pfx');
+                Signer::fromPfx(self::PKEY, 'wrongpw');
             });
         });
     }
