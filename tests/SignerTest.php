@@ -42,8 +42,12 @@ class SignerTest extends TestCase
     public function testFromPfx()
     {
         $this->describe('Signer', function () {
-            $this->should('accept a valid pfx', function () {
+            $this->should('accept a valid pfx path', function () {
                 $signer = Signer::fromPfx(self::PFX, 'secret');
+                $this->assertInstanceOf(Signer::class, $signer);
+            });
+            $this->should('accept a valid pfx', function () {
+                $signer = Signer::fromPfx(file_get_contents(self::PFX), 'secret');
                 $this->assertInstanceOf(Signer::class, $signer);
             });
             $this->should('reject a pfx with invalid password', function () {

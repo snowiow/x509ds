@@ -80,7 +80,9 @@ final class Signer
     public static function fromPfx(string $pfx, string $password): self
     {
         $pfxContent = $pfx;
-        if (file_exists($pfx)) {
+        //If PFX is the content it could contain a null byte and file_exists
+        //would throw a warning, so it needs to be checked first.
+        if (strpos($pfx, "\0") === false && file_exists($pfx)) {
             $pfxContent = file_get_contents($pfx);
         }
         $result = openssl_pkcs12_read($pfxContent, $certs, $password);
