@@ -43,6 +43,11 @@ final class Signer
     private $document;
 
     /**
+     * @var Certificate
+     */
+    private $certificate;
+
+    /**
      * Create a Signer from the given Private Key
      *
      * @param string|resource $pkey Can be a the content of the private key, a
@@ -83,7 +88,10 @@ final class Signer
             throw new InvalidPfxException();
         }
 
-        return self::fromPrivateKey($certs['pkey']);
+        $signer = self::fromPrivateKey($certs['pkey']);
+        $signer->setCertificate($certs['cert']);
+
+        return $signer;
     }
 
     /**
@@ -109,6 +117,19 @@ final class Signer
     public function setTarget(string $target): void
     {
         $this->target = $target;
+    }
+
+    /**
+     * @param string $certificate
+     */
+    public function setCertificate(string $certificate)
+    {
+        $this->certificate = new Certificate($certificate);
+    }
+
+    public function getCertificate(): Certificate
+    {
+        return $this->certificate;
     }
 
     /**
