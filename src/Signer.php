@@ -23,6 +23,11 @@ final class Signer
     private $tags;
 
     /**
+     * @var string
+     */
+    private $reference;
+
+    /**
      * @var Canonization
      */
     private $canonization;
@@ -121,6 +126,11 @@ final class Signer
         $this->target = $target;
     }
 
+    public function setSecurityTokenReference(string $uri): void
+    {
+        $this->reference = $uri;
+    }
+
     /**
      * @param string $certificate
      */
@@ -185,6 +195,10 @@ final class Signer
         $canonized      = $this->canonization->C14N($signedInfoNode);
         $signature      = $this->privateKey->sign($canonized);
         $signatureNodeFactory->appendSignatureValueNode('Signature', base64_encode($signature));
+
+        if ($this->reference !== null) {
+            $signatureNodeFactory->appendSecurityTokenReference('Signature', $this->reference);
+        }
 
         return $this->document;
     }

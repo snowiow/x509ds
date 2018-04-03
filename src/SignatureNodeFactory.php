@@ -117,6 +117,16 @@ final class SignatureNodeFactory
         $targetNode->appendChild($node);
     }
 
+    public function appendSecurityTokenReference(string $target, string $uri): void
+    {
+        $targetNode    = $this->document->getElementsByTagName($target)->item(0);
+        $node          = $this->document->createElement('wsse:SecurityTokenReference');
+        $referenceNode = $this->document->createElement('wsse:Reference');
+        $attr          = $referenceNode->setAttribute('URI', $uri);
+        $node->appendChild($referenceNode);
+        $targetNode->appendChild($node);
+    }
+
     private function createNodeWithAlgorithm(string $nodeName, string $method): DOMNode
     {
         $node = $this->document->createElement($nodeName);
