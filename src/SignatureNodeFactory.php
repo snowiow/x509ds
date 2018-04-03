@@ -120,10 +120,12 @@ final class SignatureNodeFactory
     public function appendSecurityTokenReference(string $target, string $uri): void
     {
         $targetNode    = $this->document->getElementsByTagName($target)->item(0);
-        $node          = $this->document->createElement('wsse:SecurityTokenReference');
+        $node          = $this->document->createElement('ds:KeyInfo');
+        $stcNode       = $this->document->createElement('wsse:SecurityTokenReference');
         $referenceNode = $this->document->createElement('wsse:Reference');
         $attr          = $referenceNode->setAttribute('URI', $uri);
-        $node->appendChild($referenceNode);
+        $stcNode->appendChild($referenceNode);
+        $node->appendChild($stcNode);
         $targetNode->appendChild($node);
     }
 
