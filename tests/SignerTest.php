@@ -68,11 +68,15 @@ class SignerTest extends TestCase
         $signer = Signer::fromPrivateKey(self::PKEY);
         $this->describe('Signer', function () use ($signer) {
             $this->should('set the signers document from a DOMDocument', function () use ($signer) {
-                $signer->setDocument(DOMDocument::load(self::XML));
+                $document = new DOMDocument();
+                $document->load(self::XML);
+                $signer->setDocument($document);
                 $this->assertInstanceOf(DOMDocument::class, $signer->getDocument());
             });
             $this->should('set the signers document from a XML string', function () use ($signer) {
-                $signer->setDocument(DOMDocument::loadXml(file_get_contents(self::XML)));
+                $document = new DOMDocument();
+                $document->loadXml(file_get_contents(self::XML));
+                $signer->setDocument($document);
                 $this->assertInstanceOf(DOMDocument::class, $signer->getDocument());
             });
             $this->should('set the signers document from a path', function () use ($signer) {

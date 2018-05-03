@@ -21,7 +21,8 @@ class CanonizationTest extends TestCase
     {
         $this->describe('Canonization', function () {
             $this->should('canonize via c14n', function () {
-                $document = DOMDocument::load(self::RAW_FILE);
+                $document = new DOMDocument();
+                $document->load(self::RAW_FILE);
                 $node = $document->getElementsByTagName('c')->item(0);
                 $canonization = new Canonization(Canonization::C14N);
                 $actual = $canonization->C14N($node);
@@ -31,7 +32,8 @@ class CanonizationTest extends TestCase
                 );
             });
             $this->should('canonize via c14n exclusive', function () {
-                $document = DOMDocument::load(self::RAW_FILE);
+                $document = new DOMDocument();
+                $document->load(self::RAW_FILE);
                 $node = $document->getElementsByTagName('c')->item(0);
                 $canonization = new Canonization(Canonization::C14N_EXCLUSIVE);
                 $actual = $canonization->C14N($node);
@@ -41,7 +43,8 @@ class CanonizationTest extends TestCase
                 );
             });
             $this->should('canonize via c14n with comments', function () {
-                $document = DOMDocument::load(self::RAW_FILE);
+                $document = new DOMDocument();
+                $document->load(self::RAW_FILE);
                 $node = $document->getElementsByTagName('c')->item(0);
                 $canonization = new Canonization(Canonization::C14N_WITH_COMMENTS);
                 $actual = $canonization->C14N($node);
@@ -51,7 +54,8 @@ class CanonizationTest extends TestCase
                 );
             });
             $this->should('canonize via c14n exclusive with comments', function () {
-                $document = DOMDocument::load(self::RAW_FILE);
+                $document = new DOMDocument();
+                $document->load(self::RAW_FILE);
                 $node = $document->getElementsByTagName('c')->item(0);
                 $canonization = new Canonization(Canonization::C14N_WITH_COMMENTS_EXCLUSIVE);
                 $actual = $canonization->C14N($node);
