@@ -10,7 +10,7 @@ before-script:
 script:
   - php vendor/bin/phpunit --coverage-clover clover.xml
 after_script:
-  - php vendor/bin/coveralls --coverage_clover=clover.xml -v
+  - php vendor/bin/coveralls -v
 cache:
   directories:
     - $HOME/.composer/cache/files
