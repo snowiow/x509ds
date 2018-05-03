@@ -1,11 +1,11 @@
 language: php
 php:
-  - 7.1.14
-  - 7.2
+  - 7.1.15
+  - 7.2.4
 install:
   - composer self-update
   - composer install --prefer-dist --optimize-autoloader
-before-script:
+before_script:
   - composer require php-coveralls/php-coveralls
 script:
   - php vendor/bin/phpunit --coverage-clover clover.xml
