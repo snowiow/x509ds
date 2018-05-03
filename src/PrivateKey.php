@@ -72,17 +72,6 @@ final class PrivateKey
         return self::fromContent($content, $password);
     }
 
-    public function sign(string $content): string
-    {
-        $result = openssl_sign($content, $signature, $this->resource);
-
-        if ($result === false) {
-            throw new SignatureException();
-        }
-
-        return $signature;
-    }
-
     private function __construct($resource)
     {
         $this->assertResource($resource);
@@ -92,6 +81,17 @@ final class PrivateKey
     public function __destruct()
     {
         openssl_free_key($this->resource);
+    }
+
+    public function sign(string $content): string
+    {
+        $result = openssl_sign($content, $signature, $this->resource);
+
+        if ($result === false) {
+            throw new SignatureException();
+        }
+
+        return $signature;
     }
 
     private function assertResource($resource): void

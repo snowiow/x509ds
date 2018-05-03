@@ -1,0 +1,4 @@
+<n0:c xmlns:n0="http://a.example.com" xmlns:n1="http://b.example.com">
+    <!-- A Comment for node d -->
+    <n1:d>content</n1:d>
+</n0:c>
