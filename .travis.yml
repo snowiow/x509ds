@@ -12,7 +12,7 @@ before_script:
   - composer require php-coveralls/php-coveralls
 
 script:
-  - php vendor/bin/phpunit --coverage-clover clover.xml
+  - vendor/bin/phpunit --coverage-clover clover.xml
 
 after_script:
   - php vendor/bin/php-coveralls --coverage_clover=clover.xml -v
