@@ -8,7 +8,7 @@ install:
 before-script:
   - composer require php-coveralls/php-coveralls
 script:
-  - vendor/bin/phpunit --coverage-clover clover.xml
+  - php vendor/bin/phpunit --coverage-clover clover.xml
 after_script:
   - php vendor/bin/coveralls --coverage_clover=clover.xml -v
 cache:
