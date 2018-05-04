@@ -6,17 +6,17 @@ php:
 
 install:
   - composer self-update
-  - composer install --prefer-dist --optimize-autoloader
+  - composer install --dev --no-interaction
 
 before_script:
   - composer require php-coveralls/php-coveralls
 
 script:
-  - php vendor/bin/phpunit --coverage-clover=clover.xml
+  - mkdir -p build/logs
+  - php vendor/bin/phpunit -c phpunit.xml.dist
 
-after_script:
-  - php vendor/bin/php-coveralls -v
-
-cache:
-  directories:
-    - $HOME/.composer/cache/files
+after_success:
+  - export CI_BUILD_NUMBER="$TRAVIS_BUILD_NUMBER"
+  - export CI_PULL_REQUEST="$TRAVIS_PULL_REQUEST"
+  - export CI_BRANCH="$TRAVIS_BRANCH"
+  - travis_retry php vendor/bin/php-coveralls -v
