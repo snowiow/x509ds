@@ -1,0 +1,12 @@
+<n0:a xmlns:n0="http://a.example.com">
+    <n1:b xmlns:n1="http://b.example.com">
+        <n0:c>
+            <!-- A Comment for node d -->
+            <n1:d>content</n1:d>
+        </n0:c>
+    <n1:e>
+        <n3:f xmlns:n3="http://f.example.com"/>
+    </n1:e>
+  </n1:b>
+  <n4:g xmlns:n4="http://g.example.com"/>
+</n0:a>

@@ -1,12 +1,22 @@
 language: php
+
 php:
   - 7.1.14
   - 7.2
+
 install:
   - composer self-update
   - composer install --prefer-dist --optimize-autoloader
+
+before_script:
+  - composer require php-coveralls/php-coveralls
+
 script:
-  - composer test
+  - php vendor/bin/phpunit --coverage-clover=clover.xml
+
+after_script:
+  - php vendor/bin/php-coveralls -v
+
 cache:
   directories:
     - $HOME/.composer/cache/files
