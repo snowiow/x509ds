@@ -1,8 +1,3 @@
-env:
-  - CI_BUILD_NUMBER="$TRAVIS_BUILD_NUMBER"
-  - CI_PULL_REQUEST="$TRAVIS_PULL_REQUEST"
-  - CI_BRANCH="$TRAVIS_BRANCH"
-
 language: php
 
 php:
@@ -21,4 +16,7 @@ script:
   - php vendor/bin/phpunit -c phpunit.xml.dist
 
 after_success:
+  - export CI_BUILD_NUMBER="$TRAVIS_BUILD_NUMBER"
+  - export CI_PULL_REQUEST="$TRAVIS_PULL_REQUEST"
+  - export CI_BRANCH="$TRAVIS_BRANCH"
   - travis_retry php vendor/bin/php-coveralls -v
