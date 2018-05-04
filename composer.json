@@ -25,6 +25,7 @@
     },
     "scripts": {
         "test": "@phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-clover=clover.xml",
         "phpunit": "php vendor/bin/phpunit"
     }
 }
