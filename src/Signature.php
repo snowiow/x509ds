@@ -41,7 +41,7 @@ final class Signature extends AbstractAlgorithm
     public function calculate(string $content): string
     {
         if (in_array($this->method, self::METHODS)) {
-            return openssl_digest($node, $this->extractMethod($this->method), true);
+            return openssl_digest($content, $this->extractMethod($this->method), true);
         }
         throw new Exception('Invalid signature method given: ' . $this->method);
     }
