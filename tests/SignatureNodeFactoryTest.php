@@ -57,4 +57,17 @@ class SignatureNodeFactoryTest extends TestCase
         );
         $this->assertTrue($pos > 0);
     }
+
+    public function testAppendSecurityTokenReference()
+    {
+        $node = $this->signatureNodeFactory->createSignatureMethodNode();
+        $doc  = $this->signatureNodeFactory->getDocument();
+        $doc->appendChild($node);
+        $this->signatureNodeFactory->appendSecurityTokenReference('ds:SignatureMethod', '#test');
+        $pos = strpos(
+            $doc->saveXml(),
+            '<ds:KeyInfo><wsse:SecurityTokenReference><wsse:Reference URI="#test"/></wsse:SecurityTokenReference></ds:KeyInfo>'
+        );
+        $this->assertTrue($pos > 0);
+    }
 }
