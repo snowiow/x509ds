@@ -20,7 +20,7 @@ final class Signer
     /**
      * @var array
      */
-    private $tags;
+    private $tags = [];
 
     /**
      * @var string
@@ -41,11 +41,6 @@ final class Signer
      * @var string
      */
     private $target;
-
-    /**
-     * @var DOMDocument
-     */
-    private $document;
 
     /**
      * @var Certificate
@@ -111,6 +106,7 @@ final class Signer
         $this->privateKey   = $pkey;
         $this->canonization = new Canonization(Canonization::C14N);
         $this->signature    = new Signature(Signature::SHA1);
+        $this->target       = 'Header';
     }
 
     /**
@@ -144,50 +140,31 @@ final class Signer
         return $this->certificate;
     }
 
-    /**
-     * Set a Document to be signed
-     *
-     * @param string|DOMDocument $doc Can be an XML Content string, the path or
-     *                                an DOMDocument object
-     */
-    public function setDocument($doc): void
-    {
-        if (!is_string($doc)) {
-            $this->document = $doc;
-        } else {
-            $this->document = new DOMDocument();
-            if (is_file($doc)) {
-                $this->document->load($doc);
-            } else {
-                $this->document->loadXML($doc);
-            }
-        }
-    }
-
-    /**
-     * @return DOMDocument
-     */
-    public function getDocument(): DOMDocument
-    {
-        return $this->document;
-    }
-
     public function setTags(array $tags): void
     {
         $this->tags = $tags;
     }
 
-    public function sign(): DOMDocument
+    /**
+     * Sign the given document
+     *
+     * @param string|DOMDocument $doc Can be an XML Content string, the path or
+     *                                an DOMDocument object
+     *
+     * @return DOMDocument the signed document
+     */
+    public function sign($doc): DOMDocument
     {
+        $dom                  = DOMReader::read($doc);
         $signatureNodeFactory = new SignatureNodeFactory(
             $this->canonization->getMethod(),
             $this->signature->getMethod(),
-            $this->document
+            $dom
         );
 
         $digestValues = [];
         foreach ($this->tags as $tag => $uri) {
-            $node                   = $this->document->getElementsByTagName($tag)->item(0);
+            $node                   = $dom->getElementsByTagName($tag)->item(0);
             $canonized              = $this->canonization->C14N($node);
             $digestValues[$uri]     = base64_encode($this->signature->calculate($canonized));
         }
@@ -200,6 +177,6 @@ final class Signer
             $signatureNodeFactory->appendSecurityTokenReference('Signature', $this->reference);
         }
 
-        return $this->document;
+        return $dom;
     }
 }

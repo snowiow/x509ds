@@ -3,7 +3,6 @@
 namespace X509DS\Tests;
 
 use Codeception\Specify;
-use DOMDocument;
 use PHPUnit\Framework\TestCase;
 use X509DS\Canonization;
 use X509DS\Exceptions\InvalidPfxException;
@@ -63,44 +62,30 @@ class SignerTest extends TestCase
         });
     }
 
-    public function testSetDocument()
-    {
-        $signer = Signer::fromPrivateKey(self::PKEY);
-        $this->describe('Signer', function () use ($signer) {
-            $this->should('set the signers document from a DOMDocument', function () use ($signer) {
-                $document = new DOMDocument();
-                $document->load(self::XML);
-                $signer->setDocument($document);
-                $this->assertInstanceOf(DOMDocument::class, $signer->getDocument());
-            });
-            $this->should('set the signers document from a XML string', function () use ($signer) {
-                $document = new DOMDocument();
-                $document->loadXml(file_get_contents(self::XML));
-                $signer->setDocument($document);
-                $this->assertInstanceOf(DOMDocument::class, $signer->getDocument());
-            });
-            $this->should('set the signers document from a path', function () use ($signer) {
-                $signer->setDocument(self::XML);
-                $this->assertInstanceOf(DOMDocument::class, $signer->getDocument());
-            });
-        });
-    }
-
     public function testSign()
     {
-        $signer = Signer::fromPrivateKey(self::PKEY);
-        $signer->setTags(
-            [
-                'Body'                 => '#body',
-                'Timestamp'            => '#timestamp',
-                'BinarySecurityToken'  => '#binarytoken',
-            ]
-        );
-        $signer->setTarget('Header');
-        $signer->setCanonization(Canonization::C14N_EXCLUSIVE);
-        $signer->setDocument(self::XML);
-        $document = $signer->sign();
-        $expected = file_get_contents(__DIR__ . '/resources/request_signed.xml');
-        $this->assertEquals($expected, $document->saveXML());
+        $this->describe('Signer', function () {
+            $this->should('sign a document', function () {
+                $signer = Signer::fromPrivateKey(self::PKEY);
+                $signer->setTags(
+                    [
+                        'Body'                 => '#body',
+                        'Timestamp'            => '#timestamp',
+                        'BinarySecurityToken'  => '#binarytoken',
+                    ]
+                );
+                $signer->setCanonization(Canonization::C14N_EXCLUSIVE);
+                $document = $signer->sign(self::XML);
+                $expected = file_get_contents(__DIR__ . '/resources/request_signed.xml');
+                $this->assertEquals($expected, $document->saveXML());
+            });
+            $this->should('run the signing method, without signing tags', function () {
+                $signer = Signer::fromPrivateKey(self::PKEY);
+                $signer->setTarget('Header');
+                $signer->setCanonization(Canonization::C14N_EXCLUSIVE);
+                $document = $signer->sign(self::XML);
+                $expected = file_get_contents(__DIR__ . '/resources/request.xml');
+            });
+        });
     }
 }
