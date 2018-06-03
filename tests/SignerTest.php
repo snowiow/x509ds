@@ -8,6 +8,7 @@ use X509DS\Canonization;
 use X509DS\Digest;
 use X509DS\Exceptions\AlgorithmException;
 use X509DS\Exceptions\InvalidPfxException;
+use X509DS\Signature;
 use X509DS\Signer;
 
 class SignerTest extends TestCase
@@ -85,13 +86,13 @@ class SignerTest extends TestCase
         $this->describe('Signer', function () {
             $this->should('Set a valid signature method', function () {
                 $signer = Signer::fromPrivateKey(self::PKEY);
-                $signer->setDigestMethod(Digest::SHA256);
-                $this->assertEquals(Digest::SHA256, $signer->getDigestMethod());
+                $signer->setSignatureMethod(Signature::SHA256);
+                $this->assertEquals(Signature::SHA256, $signer->getSignatureMethod());
             });
             $this->should('Throw an exception on an invalid digest method', function () {
                 $this->expectException(AlgorithmException::class);
                 $signer = Signer::fromPrivateKey(self::PKEY);
-                $signer->setDigestMethod('InvalidMethod');
+                $signer->setSignatureMethod('InvalidMethod');
             });
         });
     }

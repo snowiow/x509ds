@@ -144,14 +144,14 @@ final class Signer
     /**
      * @param string $method
      */
-    public function setSignatureValue(string  $method): void
+    public function setSignatureMethod(string $method): void
     {
         $this->signatureMethod->setMethod($method);
     }
 
     public function getSignatureMethod(): string
     {
-        $this->signatureMethod->getMethod();
+        return $this->signatureMethod->getMethod();
     }
 
     public function setTarget(string $target): void

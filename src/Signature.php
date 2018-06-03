@@ -42,10 +42,6 @@ final class Signature extends AbstractAlgorithm
         return base64_encode($signature);
     }
 
-    private function getOpenSslAlgo(): int
-    {
-    }
-
     /**
      * @return array
      */
