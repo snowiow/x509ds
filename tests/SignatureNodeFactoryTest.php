@@ -4,7 +4,7 @@ namespace X509DS\Tests;
 
 use PHPUnit\Framework\TestCase;
 use X509DS\Canonization;
-use X509DS\Signature;
+use X509DS\Digest;
 use X509DS\SignatureNodeFactory;
 
 class SignatureNodeFactoryTest extends TestCase
@@ -16,7 +16,7 @@ class SignatureNodeFactoryTest extends TestCase
 
     public function setUp()
     {
-        $this->signatureNodeFactory = new SignatureNodeFactory(Canonization::C14N_EXCLUSIVE, Signature::SHA1);
+        $this->signatureNodeFactory = new SignatureNodeFactory(Canonization::C14N_EXCLUSIVE, Digest::SHA1);
     }
 
     public function testCreateSignatureMethodNode()

@@ -12,14 +12,14 @@ use Exception;
  */
 final class Canonization extends AbstractAlgorithm
 {
-    const C14N                         = 'http://www.w3.org/TR/2001/REC-xml-c14n-20010315';
-    const C14N_EXCLUSIVE               = 'http://www.w3.org/2001/10/xml-exc-c14n#';
-    const C14N_WITH_COMMENTS           = 'http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments';
-    const C14N_WITH_COMMENTS_EXCLUSIVE = 'http://www.w3.org/2001/10/xml-exc-c14n#WithComments';
+    public const C14N                         = 'http://www.w3.org/TR/2001/REC-xml-c14n-20010315';
+    public const C14N_EXCLUSIVE               = 'http://www.w3.org/2001/10/xml-exc-c14n#';
+    public const C14N_WITH_COMMENTS           = 'http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments';
+    public const C14N_WITH_COMMENTS_EXCLUSIVE = 'http://www.w3.org/2001/10/xml-exc-c14n#WithComments';
 
     public function __construct(string $method = self::C14N)
     {
-        $this->method = $method;
+        $this->setMethod($method);
     }
 
     public function C14N(DOMNode $node): string
@@ -35,5 +35,15 @@ final class Canonization extends AbstractAlgorithm
             return $node->C14N(true, true);
         }
         throw new Exception('Invalid canonization method given: ' . $this->method);
+    }
+
+    public function getMethods(): array
+    {
+        return [
+            self::C14N,
+            self::C14N_EXCLUSIVE,
+            self::C14N_WITH_COMMENTS,
+            self::C14N_WITH_COMMENTS_EXCLUSIVE,
+        ];
     }
 }

@@ -5,9 +5,9 @@ namespace X509DS\Exceptions;
 use Exception;
 
 /**
- * Class InvalidKeyException
+ * Class SignatureException
  *
- * @package X509
+ * @package X509DS\Exceptions
  */
 final class SignatureException extends Exception
 {

@@ -33,9 +33,14 @@ final class Signer
     private $canonization;
 
     /**
-     * @var Signature
+     * @var Digest
      */
-    private $signature;
+    private $digestMethod;
+
+    /**
+     * @var Digest
+     */
+    private $signatureMethod;
 
     /**
      * @var string
@@ -103,10 +108,11 @@ final class Signer
      */
     private function __construct(PrivateKey $pkey)
     {
-        $this->privateKey   = $pkey;
-        $this->canonization = new Canonization(Canonization::C14N);
-        $this->signature    = new Signature(Signature::SHA1);
-        $this->target       = 'Header';
+        $this->privateKey      = $pkey;
+        $this->canonization    = new Canonization(Canonization::C14N);
+        $this->digestMethod    = new Digest(Digest::SHA1);
+        $this->signatureMethod = new Digest(Digest::SHA1);
+        $this->target          = 'Header';
     }
 
     /**
@@ -115,6 +121,37 @@ final class Signer
     public function setCanonization(string $method): void
     {
         $this->canonization->setMethod($method);
+    }
+
+    /**
+     * @return string
+     */
+    public function getCanonization(): string
+    {
+        return $this->canonization->getMethod();
+    }
+
+    public function setDigestMethod(string $method): void
+    {
+        $this->digestMethod->setMethod($method);
+    }
+
+    public function getDigestMethod(): string
+    {
+        return $this->digestMethod->getMethod();
+    }
+
+    /**
+     * @param string $method
+     */
+    public function setSignatureValue(string  $method): void
+    {
+        $this->signatureMethod->setMethod($method);
+    }
+
+    public function getSignatureMethod(): string
+    {
+        $this->signatureMethod->getMethod();
     }
 
     public function setTarget(string $target): void
@@ -158,7 +195,7 @@ final class Signer
         $dom                  = DOMReader::read($doc);
         $signatureNodeFactory = new SignatureNodeFactory(
             $this->canonization->getMethod(),
-            $this->signature->getMethod(),
+            $this->digestMethod->getMethod(),
             $dom
         );
 
@@ -166,11 +203,11 @@ final class Signer
         foreach ($this->tags as $tag => $uri) {
             $node                   = $dom->getElementsByTagName($tag)->item(0);
             $canonized              = $this->canonization->C14N($node);
-            $digestValues[$uri]     = base64_encode($this->signature->calculate($canonized));
+            $digestValues[$uri]     = base64_encode($this->digestMethod->calculate($canonized));
         }
-        $signedInfoNode = $signatureNodeFactory->createSignatureNode($this->target, $digestValues);
-        $canonized      = $this->canonization->C14N($signedInfoNode);
-        $signature      = $this->privateKey->sign($canonized);
+        $signedInfoNode    = $signatureNodeFactory->createSignatureNode($this->target, $digestValues);
+        $canonized         = $this->canonization->C14N($signedInfoNode);
+        $signature         = $this->privateKey->sign($canonized);
         $signatureNodeFactory->appendSignatureValueNode('Signature', base64_encode($signature));
 
         if ($this->reference !== null) {

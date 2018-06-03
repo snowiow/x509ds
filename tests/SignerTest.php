@@ -5,6 +5,8 @@ namespace X509DS\Tests;
 use Codeception\Specify;
 use PHPUnit\Framework\TestCase;
 use X509DS\Canonization;
+use X509DS\Digest;
+use X509DS\Exceptions\AlgorithmException;
 use X509DS\Exceptions\InvalidPfxException;
 use X509DS\Signer;
 
@@ -58,6 +60,54 @@ class SignerTest extends TestCase
                 $this->expectException(InvalidPfxException::class);
                 $this->expectExceptionMessage('Could not parse pfx');
                 Signer::fromPfx(self::PKEY, 'wrongpw');
+            });
+        });
+    }
+
+    public function testSetDigestMethod()
+    {
+        $this->describe('Signer', function () {
+            $this->should('Set a valid digest method', function () {
+                $signer = Signer::fromPrivateKey(self::PKEY);
+                $signer->setDigestMethod(Digest::SHA256);
+                $this->assertEquals(Digest::SHA256, $signer->getDigestMethod());
+            });
+            $this->should('Throw an exception on an invalid digest method', function () {
+                $this->expectException(AlgorithmException::class);
+                $signer = Signer::fromPrivateKey(self::PKEY);
+                $signer->setDigestMethod('InvalidMethod');
+            });
+        });
+    }
+
+    public function testSetSignatureMethod()
+    {
+        $this->describe('Signer', function () {
+            $this->should('Set a valid signature method', function () {
+                $signer = Signer::fromPrivateKey(self::PKEY);
+                $signer->setDigestMethod(Digest::SHA256);
+                $this->assertEquals(Digest::SHA256, $signer->getDigestMethod());
+            });
+            $this->should('Throw an exception on an invalid digest method', function () {
+                $this->expectException(AlgorithmException::class);
+                $signer = Signer::fromPrivateKey(self::PKEY);
+                $signer->setDigestMethod('InvalidMethod');
+            });
+        });
+    }
+
+    public function testSetCanonization()
+    {
+        $this->describe('Signer', function () {
+            $this->should('Set a valid canonization method', function () {
+                $signer = Signer::fromPrivateKey(self::PKEY);
+                $signer->setCanonization(Canonization::C14N_WITH_COMMENTS);
+                $this->assertEquals(Canonization::C14N_WITH_COMMENTS, $signer->getCanonization());
+            });
+            $this->should('Throw an exception on an invalid digest method', function () {
+                $this->expectException(AlgorithmException::class);
+                $signer = Signer::fromPrivateKey(self::PKEY);
+                $signer->setDigestMethod('InvalidMethod');
             });
         });
     }

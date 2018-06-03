@@ -2,8 +2,10 @@
 
 namespace X509DS;
 
+use X509DS\Exceptions\AlgorithmException;
+
 /**
- * Class AbstractAlgorith
+ * Class AbstractAlgorithm
  *
  * @package X509DS
  */
@@ -19,6 +21,9 @@ abstract class AbstractAlgorithm implements AlgorithmInterface
      */
     public function setMethod(string $method): void
     {
+        if (!in_array($method, $this->getMethods())) {
+            throw new AlgorithmException($method, $this->getMethods());
+        }
         $this->method = $method;
     }
 
@@ -29,4 +34,6 @@ abstract class AbstractAlgorithm implements AlgorithmInterface
     {
         return $this->method;
     }
+
+    abstract public function getMethods(): array;
 }

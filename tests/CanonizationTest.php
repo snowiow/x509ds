@@ -6,6 +6,7 @@ use Codeception\Specify;
 use DOMDocument;
 use PHPUnit\Framework\TestCase;
 use X509DS\Canonization;
+use X509DS\Exceptions\AlgorithmException;
 
 class CanonizationTest extends TestCase
 {
@@ -63,6 +64,10 @@ class CanonizationTest extends TestCase
                     self::C14N_WITH_COMMENTS_EXCLUSIVE_FILE,
                     $actual
                 );
+            });
+            $this->should('throw a AlgorithmException if an unknown method is given', function () {
+                $this->expectException(AlgorithmException::class);
+                $canonization = new Canonization('unknowncanonization');
             });
         });
     }
