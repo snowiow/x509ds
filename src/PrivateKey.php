@@ -3,6 +3,7 @@
 namespace X509DS;
 
 use InvalidArgumentException;
+use resource;
 use X509DS\Exceptions\FileNotFoundException;
 use X509DS\Exceptions\InvalidKeyException;
 
@@ -83,15 +84,9 @@ final class PrivateKey
         openssl_free_key($this->resource);
     }
 
-    public function sign(string $content): string
+    public function getResource()
     {
-        $result = openssl_sign($content, $signature, $this->resource);
-
-        if ($result === false) {
-            throw new SignatureException();
-        }
-
-        return $signature;
+        return $this->resource;
     }
 
     private function assertResource($resource): void

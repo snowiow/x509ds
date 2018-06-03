@@ -26,6 +26,11 @@ final class SignatureNodeFactory
     /**
      * @var string
      */
+    private $digestMethod;
+
+    /**
+     * @var string
+     */
     private $signatureMethod;
 
     /**
@@ -33,14 +38,15 @@ final class SignatureNodeFactory
      */
     private $canonizationMethod;
 
-    public function __construct(string $canonization, string $signature, DOMDocument $document = null)
+    public function __construct(string $canonization, string $signatureMethod, string $digestMethod, DOMDocument $document = null)
     {
         if ($document === null) {
             $document = new DOMDocument('1.0', 'utf-8');
         }
         $this->document           = $document;
         $this->canonizationMethod = $canonization;
-        $this->signatureMethod    = $signature;
+        $this->digestMethod       = $digestMethod;
+        $this->signatureMethod    = $signatureMethod;
     }
 
     public function getDocument(): DOMDocument
@@ -61,8 +67,8 @@ final class SignatureNodeFactory
         $canonizationNode = $this->createCanonicalizationMethodNode($this->canonizationMethod);
         $signedInfoNode->appendChild($canonizationNode);
 
-        $signatureMethodNode = $this->createSignatureMethodNode($this->signatureMethod);
-        $signedInfoNode->appendChild($signatureMethodNode);
+        $digestMethodNode = $this->createSignatureMethodNode($this->signatureMethod);
+        $signedInfoNode->appendChild($digestMethodNode);
 
         foreach ($references as $uri => $value) {
             $referenceNode = $this->createReferenceNode($uri, $value);
@@ -80,12 +86,18 @@ final class SignatureNodeFactory
 
     public function createSignatureMethodNode(): DOMNode
     {
-        return $this->createNodeWithAlgorithm('ds:SignatureMethod', 'http://www.w3.org/2000/09/xmldsig#rsa-sha1');
+        return $this->createNodeWithAlgorithm(
+            'ds:SignatureMethod',
+            $this->signatureMethod
+        );
     }
 
     public function createCanonicalizationMethodNode(): DOMNode
     {
-        return $this->createNodeWithAlgorithm('ds:CanonicalizationMethod', $this->canonizationMethod);
+        return $this->createNodeWithAlgorithm(
+            'ds:CanonicalizationMethod',
+            $this->canonizationMethod
+        );
     }
 
     public function createReferenceNode(string $uri, string $value): DOMNode
@@ -99,7 +111,10 @@ final class SignatureNodeFactory
         $transformsNode->appendChild($transformNode);
 
         $digestMethodNode = $this->document->createElement('ds:DigestMethod');
-        $digestAttr       = $this->createAlgorithmAttribute($digestMethodNode, $this->signatureMethod);
+        $digestAttr       = $this->createAlgorithmAttribute(
+            $digestMethodNode,
+            $this->digestMethod
+        );
 
         $digestValueNode = $this->document->createElement('ds:DigestValue', $value);
 

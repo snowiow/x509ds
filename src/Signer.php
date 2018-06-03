@@ -38,7 +38,7 @@ final class Signer
     private $digestMethod;
 
     /**
-     * @var Digest
+     * @var Signature
      */
     private $signatureMethod;
 
@@ -111,7 +111,7 @@ final class Signer
         $this->privateKey      = $pkey;
         $this->canonization    = new Canonization(Canonization::C14N);
         $this->digestMethod    = new Digest(Digest::SHA1);
-        $this->signatureMethod = new Digest(Digest::SHA1);
+        $this->signatureMethod = new Signature(Signature::SHA1);
         $this->target          = 'Header';
     }
 
@@ -195,6 +195,7 @@ final class Signer
         $dom                  = DOMReader::read($doc);
         $signatureNodeFactory = new SignatureNodeFactory(
             $this->canonization->getMethod(),
+            $this->signatureMethod->getMethod(),
             $this->digestMethod->getMethod(),
             $dom
         );
@@ -207,8 +208,8 @@ final class Signer
         }
         $signedInfoNode    = $signatureNodeFactory->createSignatureNode($this->target, $digestValues);
         $canonized         = $this->canonization->C14N($signedInfoNode);
-        $signature         = $this->privateKey->sign($canonized);
-        $signatureNodeFactory->appendSignatureValueNode('Signature', base64_encode($signature));
+        $signature         = $this->signatureMethod->calculate($canonized, $this->privateKey);
+        $signatureNodeFactory->appendSignatureValueNode('Signature', $signature);
 
         if ($this->reference !== null) {
             $signatureNodeFactory->appendSecurityTokenReference('Signature', $this->reference);
