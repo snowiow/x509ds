@@ -1,13 +1,13 @@
 <?php
 
-namespace X509DS\Exceptions;
+namespace X509DS\Exception;
 
 use Exception;
 
 /**
  * Class InvalidXmlException
  *
- * @package X509DS\Exceptions
+ * @package X509DS\Exception
  */
 final class InvalidXmlException extends Exception
 {

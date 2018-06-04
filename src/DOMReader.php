@@ -3,7 +3,7 @@
 namespace X509DS;
 
 use DOMDocument;
-use X509DS\Exceptions\InvalidXmlException;
+use X509DS\Exception\InvalidXmlException;
 
 /**
  * Class DOMReader

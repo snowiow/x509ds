@@ -3,7 +3,7 @@
 namespace X509DS;
 
 use DOMDocument;
-use X509DS\Exceptions\InvalidPfxException;
+use X509DS\Exception\InvalidPfxException;
 
 /**
  * Class Signer
@@ -131,11 +131,17 @@ final class Signer
         return $this->canonization->getMethod();
     }
 
+    /**
+     * @param string $method
+     */
     public function setDigestMethod(string $method): void
     {
         $this->digestMethod->setMethod($method);
     }
 
+    /**
+     * @return string
+     */
     public function getDigestMethod(): string
     {
         return $this->digestMethod->getMethod();
@@ -149,16 +155,25 @@ final class Signer
         $this->signatureMethod->setMethod($method);
     }
 
+    /**
+     * @return string
+     */
     public function getSignatureMethod(): string
     {
         return $this->signatureMethod->getMethod();
     }
 
+    /**
+     * @param string $target
+     */
     public function setTarget(string $target): void
     {
         $this->target = $target;
     }
 
+    /**
+     * @param string $uri
+     */
     public function setSecurityTokenReference(string $uri): void
     {
         $this->reference = $uri;
@@ -172,11 +187,17 @@ final class Signer
         $this->certificate = new Certificate($certificate);
     }
 
+    /**
+     * @return Certificate
+     */
     public function getCertificate(): Certificate
     {
         return $this->certificate;
     }
 
+    /**
+     * @param array $tags
+     */
     public function setTags(array $tags): void
     {
         $this->tags = $tags;

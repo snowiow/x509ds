@@ -5,8 +5,8 @@ namespace X509DS\Tests;
 use Codeception\Specify;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use X509DS\Exceptions\FileNotFoundException;
-use X509DS\Exceptions\InvalidKeyException;
+use X509DS\Exception\FileNotFoundException;
+use X509DS\Exception\InvalidKeyException;
 use X509DS\PrivateKey;
 
 class PrivateKeyTest extends TestCase

@@ -6,7 +6,7 @@ use Codeception\Specify;
 use DOMDocument;
 use PHPUnit\Framework\TestCase;
 use X509DS\Canonization;
-use X509DS\Exceptions\AlgorithmException;
+use X509DS\Exception\AlgorithmException;
 
 class CanonizationTest extends TestCase
 {

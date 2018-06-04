@@ -1,9 +1,9 @@
 <?php
 
-namespace X509DS\Tests\Exceptions;
+namespace X509DS\Tests\Exception;
 
 use PHPUnit\Framework\TestCase;
-use X509DS\Exceptions\InvalidKeyException;
+use X509DS\Exception\InvalidKeyException;
 
 class InvalidKeyExceptionTest extends TestCase
 {

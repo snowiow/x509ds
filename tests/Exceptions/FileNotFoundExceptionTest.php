@@ -1,9 +1,9 @@
 <?php
 
-namespace X509DS\Tests\Exceptions;
+namespace X509DS\Tests\Exception;
 
 use PHPUnit\Framework\TestCase;
-use X509DS\Exceptions\FileNotFoundException;
+use X509DS\Exception\FileNotFoundException;
 
 class FileNotFoundExceptionTest extends TestCase
 {

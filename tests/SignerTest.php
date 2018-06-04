@@ -6,8 +6,8 @@ use Codeception\Specify;
 use PHPUnit\Framework\TestCase;
 use X509DS\Canonization;
 use X509DS\Digest;
-use X509DS\Exceptions\AlgorithmException;
-use X509DS\Exceptions\InvalidPfxException;
+use X509DS\Exception\AlgorithmException;
+use X509DS\Exception\InvalidPfxException;
 use X509DS\Signature;
 use X509DS\Signer;
 

@@ -2,7 +2,7 @@
 
 namespace X509DS;
 
-use X509DS\Exceptions\AlgorithmException;
+use X509DS\Exception\AlgorithmException;
 
 /**
  * Class AbstractAlgorithm
@@ -17,7 +17,12 @@ abstract class AbstractAlgorithm implements AlgorithmInterface
     protected $method;
 
     /**
+     * Sets the method with which the algorithm is working
+     *
      * @param string $method
+     *
+     * @throws AlgorithmException if a method will be set, which is not
+     *                            supported by the algorithm
      */
     public function setMethod(string $method): void
     {
@@ -35,5 +40,10 @@ abstract class AbstractAlgorithm implements AlgorithmInterface
         return $this->method;
     }
 
+    /**
+     * Return a list of all valid methods, with which the algorithm can work
+     *
+     * @return array
+     */
     abstract public function getMethods(): array;
 }

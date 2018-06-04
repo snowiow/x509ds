@@ -15,7 +15,7 @@ final class Digest extends AbstractAlgorithm
     public const RIPEMD160 = 'http://www.w3.org/2001/04/xmlenc#ripemd160';
 
     /**
-     * @param string
+     * @param string method Digest will be initialized with the given resurce
      */
     public function __construct(string $method = self::SHA1)
     {
@@ -23,7 +23,7 @@ final class Digest extends AbstractAlgorithm
     }
 
     /**
-     * Calculates the digest hast of the given content
+     * Calculates the digest hash of the given content
      *
      * @param string $content the content to be hashed
      *
@@ -46,6 +46,11 @@ final class Digest extends AbstractAlgorithm
         return explode('#', $namespace)[1];
     }
 
+    /**
+     * Return a list of all valid methods, with which the algorithm can work
+     *
+     * @return array
+     */
     public function getMethods(): array
     {
         return [

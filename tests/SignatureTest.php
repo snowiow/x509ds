@@ -4,7 +4,7 @@ namespace X509DS\Tests;
 
 use Codeception\Specify;
 use PHPUnit\Framework\TestCase;
-use X509DS\Exceptions\AlgorithmException;
+use X509DS\Exception\AlgorithmException;
 use X509DS\PrivateKey;
 use X509DS\Signature;
 

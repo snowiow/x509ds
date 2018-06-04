@@ -6,7 +6,7 @@ use Codeception\Specify;
 use DOMDocument;
 use PHPUnit\Framework\TestCase;
 use X509DS\DOMReader;
-use X509DS\Exceptions\InvalidXmlException;
+use X509DS\Exception\InvalidXmlException;
 
 class DOMReaderTest extends TestCase
 {

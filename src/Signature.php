@@ -2,6 +2,8 @@
 
 namespace X509DS;
 
+use X509DS\Exceptions\SignatureException;
+
 /**
  * Class Signature
  *
@@ -21,11 +23,22 @@ final class Signature extends AbstractAlgorithm
         self::RIPEMD160 => OPENSSL_ALGO_RMD160,
     ];
 
+    /**
+     * @param string method Signature will be initialized with the given resurce
+     */
     public function __construct(string $method = self::SHA1)
     {
         $this->setMethod($method);
     }
 
+    /**
+     * Signs the given content with the given private key
+     *
+     * @param string     $content The content to be signed
+     * @param PrivateKey $pkey    The private key used to sign content
+     *
+     * @return string
+     */
     public function calculate(string $content, PrivateKey $pkey): string
     {
         $result = openssl_sign(
@@ -43,6 +56,8 @@ final class Signature extends AbstractAlgorithm
     }
 
     /**
+     * Return a list of all valid methods, with which the algorithm can work
+     *
      * @return array
      */
     public function getMethods(): array
