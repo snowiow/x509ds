@@ -38,7 +38,7 @@ class DigestTest extends TestCase
                     base64_encode($encrypted)
                 );
             });
-            $this->should('accept ripemd160', function () {
+            $this->should('accept ripemd160 as a method', function () {
                 $sig = new Digest(Digest::RIPEMD160);
                 $encrypted = $sig->calculate('this is a test');
                 $this->assertEquals(
