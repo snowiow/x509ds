@@ -3,7 +3,7 @@
 namespace X509DS;
 
 use DOMDocument;
-use X509DS\Exceptions\InvalidPfxException;
+use X509DS\Exception\InvalidPfxException;
 
 /**
  * Class Signer
@@ -20,7 +20,7 @@ final class Signer
     /**
      * @var array
      */
-    private $tags;
+    private $tags = [];
 
     /**
      * @var string
@@ -33,19 +33,19 @@ final class Signer
     private $canonization;
 
     /**
+     * @var Digest
+     */
+    private $digestMethod;
+
+    /**
      * @var Signature
      */
-    private $signature;
+    private $signatureMethod;
 
     /**
      * @var string
      */
     private $target;
-
-    /**
-     * @var DOMDocument
-     */
-    private $document;
 
     /**
      * @var Certificate
@@ -108,9 +108,11 @@ final class Signer
      */
     private function __construct(PrivateKey $pkey)
     {
-        $this->privateKey   = $pkey;
-        $this->canonization = new Canonization(Canonization::C14N);
-        $this->signature    = new Signature(Signature::SHA1);
+        $this->privateKey      = $pkey;
+        $this->canonization    = new Canonization(Canonization::C14N);
+        $this->digestMethod    = new Digest(Digest::SHA1);
+        $this->signatureMethod = new Signature(Signature::SHA1);
+        $this->target          = 'Header';
     }
 
     /**
@@ -121,11 +123,57 @@ final class Signer
         $this->canonization->setMethod($method);
     }
 
+    /**
+     * @return string
+     */
+    public function getCanonization(): string
+    {
+        return $this->canonization->getMethod();
+    }
+
+    /**
+     * @param string $method
+     */
+    public function setDigestMethod(string $method): void
+    {
+        $this->digestMethod->setMethod($method);
+    }
+
+    /**
+     * @return string
+     */
+    public function getDigestMethod(): string
+    {
+        return $this->digestMethod->getMethod();
+    }
+
+    /**
+     * @param string $method
+     */
+    public function setSignatureMethod(string $method): void
+    {
+        $this->signatureMethod->setMethod($method);
+    }
+
+    /**
+     * @return string
+     */
+    public function getSignatureMethod(): string
+    {
+        return $this->signatureMethod->getMethod();
+    }
+
+    /**
+     * @param string $target
+     */
     public function setTarget(string $target): void
     {
         $this->target = $target;
     }
 
+    /**
+     * @param string $uri
+     */
     public function setSecurityTokenReference(string $uri): void
     {
         $this->reference = $uri;
@@ -139,67 +187,55 @@ final class Signer
         $this->certificate = new Certificate($certificate);
     }
 
+    /**
+     * @return Certificate
+     */
     public function getCertificate(): Certificate
     {
         return $this->certificate;
     }
 
     /**
-     * Set a Document to be signed
-     *
-     * @param string|DOMDocument $doc Can be an XML Content string, the path or
-     *                                an DOMDocument object
+     * @param array $tags
      */
-    public function setDocument($doc): void
-    {
-        if (!is_string($doc)) {
-            $this->document = $doc;
-        } else {
-            $this->document = new DOMDocument();
-            if (is_file($doc)) {
-                $this->document->load($doc);
-            } else {
-                $this->document->loadXML($doc);
-            }
-        }
-    }
-
-    /**
-     * @return DOMDocument
-     */
-    public function getDocument(): DOMDocument
-    {
-        return $this->document;
-    }
-
     public function setTags(array $tags): void
     {
         $this->tags = $tags;
     }
 
-    public function sign(): DOMDocument
+    /**
+     * Sign the given document
+     *
+     * @param string|DOMDocument $doc Can be an XML Content string, the path or
+     *                                an DOMDocument object
+     *
+     * @return DOMDocument the signed document
+     */
+    public function sign($doc): DOMDocument
     {
+        $dom                  = DOMReader::read($doc);
         $signatureNodeFactory = new SignatureNodeFactory(
             $this->canonization->getMethod(),
-            $this->signature->getMethod(),
-            $this->document
+            $this->signatureMethod->getMethod(),
+            $this->digestMethod->getMethod(),
+            $dom
         );
 
         $digestValues = [];
         foreach ($this->tags as $tag => $uri) {
-            $node                   = $this->document->getElementsByTagName($tag)->item(0);
+            $node                   = $dom->getElementsByTagName($tag)->item(0);
             $canonized              = $this->canonization->C14N($node);
-            $digestValues[$uri]     = base64_encode($this->signature->calculate($canonized));
+            $digestValues[$uri]     = base64_encode($this->digestMethod->calculate($canonized));
         }
-        $signedInfoNode = $signatureNodeFactory->createSignatureNode($this->target, $digestValues);
-        $canonized      = $this->canonization->C14N($signedInfoNode);
-        $signature      = $this->privateKey->sign($canonized);
-        $signatureNodeFactory->appendSignatureValueNode('Signature', base64_encode($signature));
+        $signedInfoNode    = $signatureNodeFactory->createSignatureNode($this->target, $digestValues);
+        $canonized         = $this->canonization->C14N($signedInfoNode);
+        $signature         = $this->signatureMethod->calculate($canonized, $this->privateKey);
+        $signatureNodeFactory->appendSignatureValueNode('Signature', $signature);
 
         if ($this->reference !== null) {
             $signatureNodeFactory->appendSecurityTokenReference('Signature', $this->reference);
         }
 
-        return $this->document;
+        return $dom;
     }
 }

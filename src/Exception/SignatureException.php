@@ -1,13 +1,13 @@
 <?php
 
-namespace X509DS\Exceptions;
+namespace X509DS\Exception;
 
 use Exception;
 
 /**
- * Class InvalidKeyException
+ * Class SignatureException
  *
- * @package X509
+ * @package X509DS\Exception
  */
 final class SignatureException extends Exception
 {

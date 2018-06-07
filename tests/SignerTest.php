@@ -3,10 +3,12 @@
 namespace X509DS\Tests;
 
 use Codeception\Specify;
-use DOMDocument;
 use PHPUnit\Framework\TestCase;
 use X509DS\Canonization;
-use X509DS\Exceptions\InvalidPfxException;
+use X509DS\Digest;
+use X509DS\Exception\AlgorithmException;
+use X509DS\Exception\InvalidPfxException;
+use X509DS\Signature;
 use X509DS\Signer;
 
 class SignerTest extends TestCase
@@ -63,44 +65,78 @@ class SignerTest extends TestCase
         });
     }
 
-    public function testSetDocument()
+    public function testSetDigestMethod()
     {
-        $signer = Signer::fromPrivateKey(self::PKEY);
-        $this->describe('Signer', function () use ($signer) {
-            $this->should('set the signers document from a DOMDocument', function () use ($signer) {
-                $document = new DOMDocument();
-                $document->load(self::XML);
-                $signer->setDocument($document);
-                $this->assertInstanceOf(DOMDocument::class, $signer->getDocument());
+        $this->describe('Signer', function () {
+            $this->should('Set a valid digest method', function () {
+                $signer = Signer::fromPrivateKey(self::PKEY);
+                $signer->setDigestMethod(Digest::SHA256);
+                $this->assertEquals(Digest::SHA256, $signer->getDigestMethod());
             });
-            $this->should('set the signers document from a XML string', function () use ($signer) {
-                $document = new DOMDocument();
-                $document->loadXml(file_get_contents(self::XML));
-                $signer->setDocument($document);
-                $this->assertInstanceOf(DOMDocument::class, $signer->getDocument());
+            $this->should('Throw an exception on an invalid digest method', function () {
+                $this->expectException(AlgorithmException::class);
+                $signer = Signer::fromPrivateKey(self::PKEY);
+                $signer->setDigestMethod('InvalidMethod');
             });
-            $this->should('set the signers document from a path', function () use ($signer) {
-                $signer->setDocument(self::XML);
-                $this->assertInstanceOf(DOMDocument::class, $signer->getDocument());
+        });
+    }
+
+    public function testSetSignatureMethod()
+    {
+        $this->describe('Signer', function () {
+            $this->should('Set a valid signature method', function () {
+                $signer = Signer::fromPrivateKey(self::PKEY);
+                $signer->setSignatureMethod(Signature::SHA256);
+                $this->assertEquals(Signature::SHA256, $signer->getSignatureMethod());
+            });
+            $this->should('Throw an exception on an invalid digest method', function () {
+                $this->expectException(AlgorithmException::class);
+                $signer = Signer::fromPrivateKey(self::PKEY);
+                $signer->setSignatureMethod('InvalidMethod');
+            });
+        });
+    }
+
+    public function testSetCanonization()
+    {
+        $this->describe('Signer', function () {
+            $this->should('Set a valid canonization method', function () {
+                $signer = Signer::fromPrivateKey(self::PKEY);
+                $signer->setCanonization(Canonization::C14N_WITH_COMMENTS);
+                $this->assertEquals(Canonization::C14N_WITH_COMMENTS, $signer->getCanonization());
+            });
+            $this->should('Throw an exception on an invalid digest method', function () {
+                $this->expectException(AlgorithmException::class);
+                $signer = Signer::fromPrivateKey(self::PKEY);
+                $signer->setDigestMethod('InvalidMethod');
             });
         });
     }
 
     public function testSign()
     {
-        $signer = Signer::fromPrivateKey(self::PKEY);
-        $signer->setTags(
-            [
-                'Body'                 => '#body',
-                'Timestamp'            => '#timestamp',
-                'BinarySecurityToken'  => '#binarytoken',
-            ]
-        );
-        $signer->setTarget('Header');
-        $signer->setCanonization(Canonization::C14N_EXCLUSIVE);
-        $signer->setDocument(self::XML);
-        $document = $signer->sign();
-        $expected = file_get_contents(__DIR__ . '/resources/request_signed.xml');
-        $this->assertEquals($expected, $document->saveXML());
+        $this->describe('Signer', function () {
+            $this->should('sign a document', function () {
+                $signer = Signer::fromPrivateKey(self::PKEY);
+                $signer->setTags(
+                    [
+                        'Body'                 => '#body',
+                        'Timestamp'            => '#timestamp',
+                        'BinarySecurityToken'  => '#binarytoken',
+                    ]
+                );
+                $signer->setCanonization(Canonization::C14N_EXCLUSIVE);
+                $document = $signer->sign(self::XML);
+                $expected = file_get_contents(__DIR__ . '/resources/request_signed.xml');
+                $this->assertEquals($expected, $document->saveXML());
+            });
+            $this->should('run the signing method, without signing tags', function () {
+                $signer = Signer::fromPrivateKey(self::PKEY);
+                $signer->setTarget('Header');
+                $signer->setCanonization(Canonization::C14N_EXCLUSIVE);
+                $document = $signer->sign(self::XML);
+                $expected = file_get_contents(__DIR__ . '/resources/request.xml');
+            });
+        });
     }
 }

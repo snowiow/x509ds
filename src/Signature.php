@@ -2,7 +2,7 @@
 
 namespace X509DS;
 
-use Exception;
+use X509DS\Exceptions\SignatureException;
 
 /**
  * Class Signature
@@ -11,50 +11,62 @@ use Exception;
  */
 final class Signature extends AbstractAlgorithm
 {
-    const SHA1      = 'http://www.w3.org/2000/09/xmldsig#sha1';
-    const SHA256    = 'http://www.w3.org/2001/04/xmlenc#sha256';
-    const SHA512    = 'http://www.w3.org/2001/04/xmlenc#sha512';
-    const RIPEMD160 = 'http://www.w3.org/2001/04/xmlenc#ripemd160';
+    public const SHA1      = 'http://www.w3.org/2000/09/xmldsig#rsa-sha1';
+    public const SHA256    = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256';
+    public const SHA512    = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512';
+    public const RIPEMD160 = 'http://www.w3.org/2001/04/xmldsig-more#rsa-ripemd160';
 
-    const METHODS = [
-        self::SHA1,
-        self::SHA256,
-        self::SHA512,
-        self::RIPEMD160,
+    private const OPENSSL_MAPPING = [
+        self::SHA1      => OPENSSL_ALGO_SHA1,
+        self::SHA256    => OPENSSL_ALGO_SHA256,
+        self::SHA512    => OPENSSL_ALGO_SHA512,
+        self::RIPEMD160 => OPENSSL_ALGO_RMD160,
     ];
 
     /**
-     * @param string
+     * @param string method Signature will be initialized with the given resurce
      */
     public function __construct(string $method = self::SHA1)
     {
-        $this->method = $method;
+        $this->setMethod($method);
     }
 
     /**
-     * Calculates the digest hast of the given content
+     * Signs the given content with the given private key
      *
-     * @param string $content the content to be hashed
-     *
-     * @return string the raw output of the hashed content
-     */
-    public function calculate(string $content): string
-    {
-        if (in_array($this->method, self::METHODS)) {
-            return openssl_digest($content, $this->extractMethod($this->method), true);
-        }
-        throw new Exception('Invalid signature method given: ' . $this->method);
-    }
-
-    /**
-     * Takes a xml namespace and extracts the method from it
-     *
-     * @param string $namespace
+     * @param string     $content The content to be signed
+     * @param PrivateKey $pkey    The private key used to sign content
      *
      * @return string
      */
-    private function extractMethod(string $namespace): string
+    public function calculate(string $content, PrivateKey $pkey): string
     {
-        return explode('#', $namespace)[1];
+        $result = openssl_sign(
+            $content,
+            $signature,
+            $pkey->getResource(),
+            self::OPENSSL_MAPPING[$this->getMethod()]
+        );
+
+        if ($result === false) {
+            throw new SignatureException();
+        }
+
+        return base64_encode($signature);
+    }
+
+    /**
+     * Return a list of all valid methods, with which the algorithm can work
+     *
+     * @return array
+     */
+    public function getMethods(): array
+    {
+        return [
+            self::SHA1,
+            self::SHA256,
+            self::SHA512,
+            self::RIPEMD160,
+        ];
     }
 }

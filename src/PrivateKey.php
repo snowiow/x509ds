@@ -3,8 +3,9 @@
 namespace X509DS;
 
 use InvalidArgumentException;
-use X509DS\Exceptions\FileNotFoundException;
-use X509DS\Exceptions\InvalidKeyException;
+use resource;
+use X509DS\Exception\FileNotFoundException;
+use X509DS\Exception\InvalidKeyException;
 
 /**
  * Class PrivateKey
@@ -72,28 +73,38 @@ final class PrivateKey
         return self::fromContent($content, $password);
     }
 
+    /**
+     * Construct a PrivateKey object with the given resource
+     *
+     * @param resource $resource
+     */
     private function __construct($resource)
     {
         $this->assertResource($resource);
         $this->resource = $resource;
     }
 
+    /**
+     * Destroys the held resource
+     */
     public function __destruct()
     {
         openssl_free_key($this->resource);
     }
 
-    public function sign(string $content): string
+    /**
+     * Returns the held resource
+     */
+    public function getResource()
     {
-        $result = openssl_sign($content, $signature, $this->resource);
-
-        if ($result === false) {
-            throw new SignatureException();
-        }
-
-        return $signature;
+        return $this->resource;
     }
 
+    /**
+     * Assert if the given resource is valid
+     *
+     * @param resource $resource
+     */
     private function assertResource($resource): void
     {
         if (is_resource($resource) == false) {

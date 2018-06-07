@@ -1,17 +1,20 @@
 <?php
 
-namespace X509DS\Exceptions;
+namespace X509DS\Exception;
 
 use Exception;
 
 /**
  * Class FileNotFoundException
  *
- * @package X509DS\Exceptions
+ * @package X509DS\Exception
  */
 final class FileNotFoundException extends Exception
 {
-    public function __construct($path)
+    /**
+     * @param string $path the path, which doesn't exist in file system
+     */
+    public function __construct(string $path)
     {
         parent::__construct('File not found: ' . $path);
     }

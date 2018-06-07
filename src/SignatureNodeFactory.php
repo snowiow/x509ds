@@ -26,6 +26,11 @@ final class SignatureNodeFactory
     /**
      * @var string
      */
+    private $digestMethod;
+
+    /**
+     * @var string
+     */
     private $signatureMethod;
 
     /**
@@ -33,21 +38,46 @@ final class SignatureNodeFactory
      */
     private $canonizationMethod;
 
-    public function __construct(string $canonization, string $signature, DOMDocument $document = null)
+    /**
+     * Construct a SignatureNodeFactory with the given method strings. These
+     * will be put as XML namespaces in the XML tags
+     *
+     * @param string      $canonization    the canonization method as a XML namespace
+     * @param string      $signatureMethod the signature method as a XML namespace
+     * @param string      $digestMethod    the digest method as a XML namespace
+     * @param DOMDocument $document        the document on which the new nodes will be
+     *                                     created
+     */
+    public function __construct(string $canonization, string $signatureMethod, string $digestMethod, DOMDocument $document = null)
     {
         if ($document === null) {
             $document = new DOMDocument('1.0', 'utf-8');
         }
         $this->document           = $document;
         $this->canonizationMethod = $canonization;
-        $this->signatureMethod    = $signature;
+        $this->digestMethod       = $digestMethod;
+        $this->signatureMethod    = $signatureMethod;
     }
 
+    /**
+     * @return DOMDocument the DOMDocument in it's current, modfified state
+     */
     public function getDocument(): DOMDocument
     {
         return $this->document;
     }
 
+    /**
+     * Creates the signature node. This is the parent of every signature sub
+     * node
+     *
+     * @param string $target     where to add the node as child. A node name is
+     *                           expected and will be determined by getElementsByTagName
+     * @param array  $references all the reference DOMNodes, which will be
+     *                           appended to the SignatureNode as children
+     *
+     * @return DOMNode
+     */
     public function createSignatureNode(string $target, array $references): DOMNode
     {
         $targetNode    = $this->document->getElementsByTagName($target)->item(0);
@@ -61,8 +91,8 @@ final class SignatureNodeFactory
         $canonizationNode = $this->createCanonicalizationMethodNode($this->canonizationMethod);
         $signedInfoNode->appendChild($canonizationNode);
 
-        $signatureMethodNode = $this->createSignatureMethodNode($this->signatureMethod);
-        $signedInfoNode->appendChild($signatureMethodNode);
+        $digestMethodNode = $this->createSignatureMethodNode($this->signatureMethod);
+        $signedInfoNode->appendChild($digestMethodNode);
 
         foreach ($references as $uri => $value) {
             $referenceNode = $this->createReferenceNode($uri, $value);
@@ -78,16 +108,38 @@ final class SignatureNodeFactory
         return $this->document->getElementsByTagName('SignedInfo')->item(0);
     }
 
+    /**
+     * @return DOMNode
+     */
     public function createSignatureMethodNode(): DOMNode
     {
-        return $this->createNodeWithAlgorithm('ds:SignatureMethod', 'http://www.w3.org/2000/09/xmldsig#rsa-sha1');
+        return $this->createNodeWithAlgorithm(
+            'ds:SignatureMethod',
+            $this->signatureMethod
+        );
     }
 
+    /**
+     * @return DOMNode
+     */
     public function createCanonicalizationMethodNode(): DOMNode
     {
-        return $this->createNodeWithAlgorithm('ds:CanonicalizationMethod', $this->canonizationMethod);
+        return $this->createNodeWithAlgorithm(
+            'ds:CanonicalizationMethod',
+            $this->canonizationMethod
+        );
     }
 
+    /**
+     * Creates a reference node
+     *
+     * @param string $uri   the uri to the identifier, to which node this
+     *                      reference node belongs
+     * @param string $value the calculated value of the node, which will
+     *                      be set as the digestValue
+     *
+     * @return DOMNode
+     */
     public function createReferenceNode(string $uri, string $value): DOMNode
     {
         $referenceNode = $this->document->createElement('ds:Reference');
@@ -99,7 +151,10 @@ final class SignatureNodeFactory
         $transformsNode->appendChild($transformNode);
 
         $digestMethodNode = $this->document->createElement('ds:DigestMethod');
-        $digestAttr       = $this->createAlgorithmAttribute($digestMethodNode, $this->signatureMethod);
+        $digestAttr       = $this->createAlgorithmAttribute(
+            $digestMethodNode,
+            $this->digestMethod
+        );
 
         $digestValueNode = $this->document->createElement('ds:DigestValue', $value);
 
@@ -110,6 +165,13 @@ final class SignatureNodeFactory
         return $referenceNode;
     }
 
+    /**
+     * Appends the signature value node to the signature node
+     *
+     * @param string $target the target at which the node will be appended
+     *                       as a child
+     * @param string $value  the calculated value to be set into the node
+     */
     public function appendSignatureValueNode(string $target, string $value): void
     {
         $targetNode = $this->document->getElementsByTagName($target)->item(0);
@@ -117,6 +179,13 @@ final class SignatureNodeFactory
         $targetNode->appendChild($node);
     }
 
+    /**
+     * Appends a optional SecurityTokenReference node to the Signature
+     *
+     * @param string $target the target at which the node will be appended
+     *                       as a child
+     * @param string $uri    the uri to the BinarySecurityToken identifier
+     */
     public function appendSecurityTokenReference(string $target, string $uri): void
     {
         $targetNode    = $this->document->getElementsByTagName($target)->item(0);
@@ -129,6 +198,15 @@ final class SignatureNodeFactory
         $targetNode->appendChild($node);
     }
 
+    /**
+     * Creates a Algorithm Node with the given name and method
+     *
+     * @param string $nodeName the name of the node
+     * @params string $method the method which will be set as the nodes
+     * attribute
+     *
+     * @return DOMNode
+     */
     private function createNodeWithAlgorithm(string $nodeName, string $method): DOMNode
     {
         $node = $this->document->createElement($nodeName);
@@ -140,8 +218,9 @@ final class SignatureNodeFactory
     /**
      * Create the Algorithm Attribute
      *
-     * @param string $algo the name of the algorithm, which will be the value
-     *                     of the attribute
+     * @param DOMElement $elem The element to which the algo attribute is set
+     * @param string     $algo the name of the algorithm, which will be the value
+     *                         of the attribute
      */
     private function createAlgorithmAttribute(DOMElement $elem, string $algo): void
     {
