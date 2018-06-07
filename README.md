@@ -1,4 +1,5 @@
 # X509DS - Digital Signature generation Library for XML Requests
+[![Coverage Status](https://coveralls.io/repos/github/snowiow/x509ds/badge.svg?branch=master)](https://coveralls.io/github/snowiow/x509ds?branch=master)
 ## Introduction
 X509DS is a library to help with the tedious process of appending a digital signature node to a X509 authentication request. A X509 request normally looks something like this:
 ```xml
