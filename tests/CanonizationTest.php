@@ -35,7 +35,7 @@ class CanonizationTest extends TestCase
                 $document = new DOMDocument();
                 $document->load(self::RAW_FILE);
                 $node = $document->getElementsByTagName('c')->item(0);
-                $canonization = new Canonization(Canonization::C14N_EXCLUSIVE);
+                $canonization = new Canonization(Canonization::C14N);
                 $actual = $canonization->C14N($node);
                 $this->assertXmlStringEqualsXmlFile(
                     self::C14N_EXCLUSIVE_FILE,
